@@ -6,7 +6,7 @@ float distance;
 
 void setup() {
   size(600, 600);
-  myPort = new Serial(this, Serial.list()[0], 4800);
+  myPort = new Serial(this, Serial.list()[0], 9600);
   myPort.bufferUntil('\n');
 }
 
