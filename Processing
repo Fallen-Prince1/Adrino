@@ -1,0 +1,54 @@
+import processing.serial.*;
+
+Serial myPort;
+float angle;
+float distance;
+
+void setup() {
+  size(600, 600);
+  myPort = new Serial(this, Serial.list()[0], 4800);
+  myPort.bufferUntil('\n');
+}
+
+void draw() {
+  background(0);
+  translate(width/2, height/2);
+
+  // Radar sweep
+  fill(0, 255, 0, 50);
+  noStroke();
+  arc(0, 0, 500, 500, radians(-90), radians(angle - 90));
+
+  // Draw detected points
+  stroke(0, 255, 0);
+  strokeWeight(8);
+  float x = cos(radians(angle - 90)) * distance * 2;
+  float y = sin(radians(angle - 90)) * distance * 2;
+  point(x, y);
+
+  // Radar outline
+  stroke(0, 255, 0);
+  noFill();
+  ellipse(0, 0, 500, 500);
+  ellipse(0, 0, 400, 400);
+  ellipse(0, 0, 300, 300);
+  ellipse(0, 0, 200, 200);
+  ellipse(0, 0, 100, 100);
+
+  // Display angle and distance text
+  fill(255);
+  text("Angle: " + int(angle) + "°", -width/2 + 20, height/2 - 50);
+  text("Distance: " + int(distance) + " cm", -width/2 + 20, height/2 - 30);
+}
+
+void serialEvent(Serial myPort) {
+  String data = myPort.readStringUntil('\n');
+  if (data != null) {
+    data = trim(data);
+    String[] parts = split(data, ',');
+    if (parts.length == 2) {
+      angle = float(parts[0]);
+      distance = float(parts[1]);
+    }
+  }
+}
