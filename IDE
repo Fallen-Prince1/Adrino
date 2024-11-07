@@ -3,7 +3,7 @@
 // Pin definitions
 const int trigPin = 9;
 const int echoPin = 10;
-const int servoPin = 3;
+const int servoPin = 8;
 
 // Variables
 Servo myServo;
