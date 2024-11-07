@@ -1,0 +1,54 @@
+import processing.serial.*;
+
+Serial myPort;  // The serial port
+float angle;    // Angle received from Arduino
+float distance; // Distance received from Arduino
+
+void setup() {
+  size(600, 600);
+  myPort = new Serial(this, Serial.list()[0], 9600);  // Adjust the Serial.list()[0] if necessary
+  myPort.bufferUntil('\n');  // Read data line by line
+  background(0);  // Set background to black for radar effect
+}
+
+void draw() {
+  fill(0, 20); // Slightly fade the previous drawing for radar effect
+  noStroke();
+  rect(0, 0, width, height);
+  
+  // Draw radar
+  translate(width/2, height/2); // Move origin to center
+  stroke(0, 255, 0); // Green radar color
+  
+  // Draw radar circles
+  noFill();
+  for (int i = 1; i <= 5; i++) {
+    ellipse(0, 0, i * 100, i * 100); // Each circle is 100 px apart
+  }
+  
+  // Draw radar line (rotating line showing current angle)
+  float x = cos(radians(angle)) * 250;
+  float y = sin(radians(angle)) * 250;
+  strokeWeight(2);
+  line(0, 0, x, y);
+  
+  // If there's a valid distance, draw a point where object is detected
+  if (distance > 0 && distance <= 250) {
+    float px = cos(radians(angle)) * distance;
+    float py = sin(radians(angle)) * distance;
+    fill(255, 0, 0);
+    ellipse(px, py, 10, 10); // Red dot for detected object
+  }
+}
+
+void serialEvent(Serial myPort) {
+  String data = myPort.readStringUntil('\n'); // Read data from serial port
+  if (data != null) {
+    data = trim(data); // Remove any extra whitespace
+    String[] values = split(data, ','); // Assume data format: "angle,distance"
+    if (values.length == 2) {
+      angle = float(values[0]);
+      distance = float(values[1]);
+    }
+  }
+}
